@@ -3,8 +3,8 @@
 use std::error::Error;
 use std::fs;
 
-mod sha256;
-mod md5;
+pub mod sha256;
+pub mod md5;
 
 #[derive(Debug)]
 pub enum HashType {
@@ -53,8 +53,22 @@ pub enum HashResult {
     SHA256([u8; 32])
 }
 
+pub fn hash_to_hex_string(h: &[u8]) -> String {
+    let mut hex_string = String::new();
+    for byte in h {
+        hex_string.push_str(&format!("{:02x}", byte));
+    }
+    hex_string
+}
+
 pub fn run(config: Config) -> Result<(), Box<dyn Error>> {
-    eprintln!("Calculating {:?} hash for {} files...", config.hash_type, config.file_paths.len());
+    let file_count = config.file_paths.len();
+    eprintln!("Computing {:?} checksum for {} file{}...", config.hash_type, file_count, {
+        match file_count {
+            1 => "",
+            _ => "s"
+        }
+    });
 
     let mut hashes: Vec<(String, HashResult)> = Vec::new();
 
@@ -70,13 +84,13 @@ pub fn run(config: Config) -> Result<(), Box<dyn Error>> {
 
     //output results
     for (file_path, hash) in hashes {
-        if let HashResult::SHA256(h) = hash {
-            let mut hex_string = String::new();
-
-            for byte in h {
-                hex_string.push_str(&format!("{:x}", byte));
+        match hash {
+            HashResult::SHA256(h) => {
+                println!("\"{}\": {}", file_path, hash_to_hex_string(&h));
+            },
+            HashResult::MD5(h) => {
+                println!("\"{}\": {}", file_path, hash_to_hex_string(&h));
             }
-            println!("\"{}\": {}", file_path, hex_string);
         }
     }
     
