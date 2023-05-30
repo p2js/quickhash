@@ -1,5 +1,3 @@
-#![allow(unused)]
-
 use std::error::Error;
 use std::fs;
 
@@ -31,7 +29,7 @@ impl Config {
                 continue;
             }
 
-            if (arg == "--hash") || (args[index] == "-h") {
+            if (arg == "--hash") || (arg == "-h") {
                 hash_type = match args[index + 2].to_lowercase().as_str() {
                     "md5" => HashType::MD5,
                     "sha256" => HashType::SHA256,

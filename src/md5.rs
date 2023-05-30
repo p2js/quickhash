@@ -56,23 +56,30 @@ pub fn md5(source: &Vec<u8>) -> HashResult {
         let mut temp = h;
         //compression (main loop)
         for i in 0usize..64usize {
-            let (mut temp1, mut temp2) = (0, 0);
-            match i {
+            let (mut temp1, temp2) = match i {
                 0..=15 => {
-                    temp1 = (temp[1] & temp[2]) | (!temp[1] & temp[3]);
-                    temp2 = i;
+                    ( 
+                        (temp[1] & temp[2]) | (!temp[1] & temp[3]),
+                        i
+                    )
                 }
                 16..=31 => {
-                    temp1 = (temp[3] & temp[1]) | (!temp[3] & temp[2]);
-                    temp2 = (5*i).wrapping_add(1) % 16;
+                    (
+                        (temp[3] & temp[1]) | (!temp[3] & temp[2]),
+                        (5*i).wrapping_add(1) % 16
+                    )
                 }
                 32..=47 => {
-                    temp1 = temp[1] ^ temp[2] ^ temp[3];
-                    temp2 = (3*i).wrapping_add(5) % 16;
+                    (
+                        temp[1] ^ temp[2] ^ temp[3],
+                        (3*i).wrapping_add(5) % 16
+                    )
                 }
                 48..=63 => {
-                    temp1 = temp[2] ^ (temp[1] | !temp[3]);
-                    temp2 = (7*i) % 16;
+                    (
+                        temp[2] ^ (temp[1] | !temp[3]),
+                        (7*i) % 16
+                    )
                 }
                 _ => unreachable!()
             };
